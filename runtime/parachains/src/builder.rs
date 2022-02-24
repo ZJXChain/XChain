@@ -63,7 +63,10 @@ fn byte32_slice_from(n: u32) -> [u8; 32] {
 }
 
 /// Paras inherent `enter` benchmark scenario builder.
-pub(crate) struct BenchBuilder<T: paras_inherent::Config> {
+pub(crate) struct BenchBuilder<T>
+where
+	T: paras_inherent::Config + initializer::Config,
+{
 	/// Active validators. Validators should be declared prior to all other setup.
 	validators: Option<Vec<ValidatorId>>,
 	/// Starting block number; we expect it to get incremented on session setup.
@@ -100,7 +103,10 @@ pub(crate) struct Bench<T: paras_inherent::Config> {
 	pub(crate) _block_number: T::BlockNumber,
 }
 
-impl<T: paras_inherent::Config> BenchBuilder<T> {
+impl<T> BenchBuilder<T>
+where
+	T: paras_inherent::Config + initializer::Config,
+{
 	/// Create a new `BenchBuilder` with some opinionated values that should work with the rest
 	/// of the functions in this implementation.
 	pub(crate) fn new() -> Self {

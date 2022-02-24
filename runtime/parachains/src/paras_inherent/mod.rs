@@ -185,9 +185,7 @@ pub mod pallet {
 
 	#[pallet::config]
 	#[pallet::disable_frame_system_supertrait_check]
-	pub trait Config:
-		inclusion::Config + scheduler::Config + initializer::Config + pallet_babe::Config
-	{
+	pub trait Config: inclusion::Config + scheduler::Config + pallet_babe::Config {
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
 	}
@@ -638,6 +636,22 @@ impl<T: Config> Pallet<T> {
 }
 
 impl<T: Config> Pallet<T> {
+	/// Block initialization logic, called by initializer.
+	pub(crate) fn initializer_initialize(_now: T::BlockNumber) -> Weight {
+		0
+	}
+
+	/// Block finalization logic, called by initializer.
+	pub(crate) fn initializer_finalize() {}
+
+	/// Called by the initializer to note that a new session has started.
+	pub(crate) fn initializer_on_new_session(
+		_notification: &initializer::SessionChangeNotification<T::BlockNumber>,
+	) {
+		// Clear allowed relay parents on session change.
+		AllowedRelayParents::<T>::mutate(|tracker| tracker.buffer.clear());
+	}
+
 	/// Create the `ParachainsInherentData` that gets passed to [`Self::enter`] in [`Self::create_inherent`].
 	/// This code is pulled out of [`Self::create_inherent`] so it can be unit tested.
 	fn create_inherent_inner(data: &InherentData) -> Option<ParachainsInherentData<T::Header>> {

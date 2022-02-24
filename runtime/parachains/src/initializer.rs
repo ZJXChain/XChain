@@ -22,7 +22,7 @@
 use crate::{
 	configuration::{self, HostConfiguration},
 	disputes::DisputesHandler,
-	dmp, hrmp, inclusion, paras, scheduler, session_info, shared, ump,
+	dmp, hrmp, inclusion, paras, paras_inherent, scheduler, session_info, shared, ump,
 };
 use frame_support::{
 	traits::{OneSessionHandler, Randomness},
@@ -107,6 +107,7 @@ pub mod pallet {
 		+ shared::Config
 		+ paras::Config
 		+ scheduler::Config
+		+ paras_inherent::Config
 		+ inclusion::Config
 		+ session_info::Config
 		+ dmp::Config
@@ -150,6 +151,7 @@ pub mod pallet {
 			// - Configuration
 			// - Paras
 			// - Scheduler
+			// - ParasInherent
 			// - Inclusion
 			// - `SessionInfo`
 			// - Disputes
@@ -161,6 +163,7 @@ pub mod pallet {
 				paras::Pallet::<T>::initializer_initialize(now) +
 				scheduler::Pallet::<T>::initializer_initialize(now) +
 				inclusion::Pallet::<T>::initializer_initialize(now) +
+				paras_inherent::Pallet::<T>::initializer_initialize(now) +
 				session_info::Pallet::<T>::initializer_initialize(now) +
 				T::DisputesHandler::initializer_initialize(now) +
 				dmp::Pallet::<T>::initializer_initialize(now) +
@@ -179,6 +182,7 @@ pub mod pallet {
 			dmp::Pallet::<T>::initializer_finalize();
 			T::DisputesHandler::initializer_finalize();
 			session_info::Pallet::<T>::initializer_finalize();
+			paras_inherent::Pallet::<T>::initializer_finalize();
 			inclusion::Pallet::<T>::initializer_finalize();
 			scheduler::Pallet::<T>::initializer_finalize();
 			paras::Pallet::<T>::initializer_finalize(now);
@@ -258,6 +262,7 @@ impl<T: Config> Pallet<T> {
 		let outgoing_paras = paras::Pallet::<T>::initializer_on_new_session(&notification);
 		scheduler::Pallet::<T>::initializer_on_new_session(&notification);
 		inclusion::Pallet::<T>::initializer_on_new_session(&notification);
+		paras_inherent::Pallet::<T>::initializer_on_new_session(&notification);
 		session_info::Pallet::<T>::initializer_on_new_session(&notification);
 		T::DisputesHandler::initializer_on_new_session(&notification);
 		dmp::Pallet::<T>::initializer_on_new_session(&notification, &outgoing_paras);
